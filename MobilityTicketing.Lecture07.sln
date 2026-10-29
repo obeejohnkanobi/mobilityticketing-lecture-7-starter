@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2392805E-36B4-4226-85AA-07176826BB24}"
+	ProjectSection(SolutionItems) = preProject
+		src\design.md = src\design.md
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MobilityTicketing.Lecture07", "src\MobilityTicketing.Lecture07\MobilityTicketing.Lecture07.csproj", "{8A101D00-D34A-40B9-9EEC-378198FCB19A}"
 EndProject
