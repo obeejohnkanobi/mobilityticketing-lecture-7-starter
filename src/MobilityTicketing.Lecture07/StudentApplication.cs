@@ -1,11 +1,16 @@
 using MobilityTicketing.Lecture07.Contracts;
 using MobilityTicketing.Lecture07.Data;
 using MobilityTicketing.Lecture07.Diagnostics;
+using MobilityTicketing.Lecture07.Queries;
 
 namespace MobilityTicketing.Lecture07;
 
-public sealed class StudentApplication(string connection, TimeProvider? clock = null,
-    ApplicationHooks? hooks = null, RunMeasurement? measurement = null) : ILectureApplication
+public sealed class StudentApplication(
+    string connection, 
+    TimeProvider? clock = null,
+    ApplicationHooks? hooks = null, 
+    RunMeasurement? measurement = null
+    ) : ILectureApplication
 {
     public string Connection { get; } = connection;
     public TimeProvider Clock { get; } = clock ?? TimeProvider.System;
@@ -14,8 +19,20 @@ public sealed class StudentApplication(string connection, TimeProvider? clock = 
     public LectureDbContext CreateContext() => LectureDbContext.Create(Connection, measurement: Measurement);
 
     // Connect your command and query classes here.
-    public Task<List<RouteOverviewDto>> ReadOverviewAsync(TimeWindow window, CancellationToken ct = default) =>
-        throw new NotImplementedException("Implement the live route-board query.");
+    public async Task<List<RouteOverviewDto>> ReadOverviewAsync(
+        TimeWindow window,
+        CancellationToken ct = default)
+    {
+        // Reject invalid windows before accessing the database.
+        ArgumentNullException.ThrowIfNull(window);
+        window.Validate();
+
+        // Create and dispose the EF Core DbContext asynchronously.
+        await using var db = CreateContext();
+
+        // Delegate the query to the dedicated read class.
+        return await ReadRouteOverviewQuery.ExecuteAsync(db, window, ct);
+    }
     public Task<CancelResult> CancelTripAsync(string tripId, CancellationToken ct = default) =>
         throw new NotImplementedException("Implement trip cancellation.");
     public Task<RenameResult> RenameRouteAsync(string routeId, string name, CancellationToken ct = default) =>
